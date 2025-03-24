@@ -1,5 +1,5 @@
 import logging
-from graphviz import Digraph  # type: ignore
+# from graphviz import Digraph  # type: ignore
 from collections import deque
 import re
 
@@ -234,36 +234,36 @@ class RegexEngine:
             self._add_state(eps, states)
 
 
-def visualize(self) -> Digraph:
-    dot = Digraph()
-    visited = set()
-    queue = deque([self.nfa.start])
+# def visualize(self) -> Digraph:
+#     dot = Digraph()
+#     visited = set()
+#     queue = deque([self.nfa.start])
 
-    while queue:
-        state = queue.popleft()
-        if state.id in visited:
-            continue
-        visited.add(state.id)
+#     while queue:
+#         state = queue.popleft()
+#         if state.id in visited:
+#             continue
+#         visited.add(state.id)
 
-        shape = "doublecircle" if state == self.nfa.end else "circle"
-        dot.node(str(state.id), shape=shape)
+#         shape = "doublecircle" if state == self.nfa.end else "circle"
+#         dot.node(str(state.id), shape=shape)
 
-        # 处理 ε-转移
-        for eps in state.epsilon:
-            dot.edge(str(state.id), str(eps.id), label="ε")
-            queue.append(eps)
+#         # 处理 ε-转移
+#         for eps in state.epsilon:
+#             dot.edge(str(state.id), str(eps.id), label="ε")
+#             queue.append(eps)
 
-        # 处理字符转移
-        for char, targets in state.transitions.items():
-            # 处理字符类标签
-            if char == "class" and state.char_class:
-                positive, chars = state.char_class
-                sorted_chars = "".join(sorted(chars))
-                label = f"[{'^' if not positive else ''}{sorted_chars}]"
-            else:
-                label = char
-            # 添加边
-            for target in targets:
-                dot.edge(str(state.id), str(target.id), label=label)
-                queue.append(target)
-    return dot
+#         # 处理字符转移
+#         for char, targets in state.transitions.items():
+#             # 处理字符类标签
+#             if char == "class" and state.char_class:
+#                 positive, chars = state.char_class
+#                 sorted_chars = "".join(sorted(chars))
+#                 label = f"[{'^' if not positive else ''}{sorted_chars}]"
+#             else:
+#                 label = char
+#             # 添加边
+#             for target in targets:
+#                 dot.edge(str(state.id), str(target.id), label=label)
+#                 queue.append(target)
+#     return dot
