@@ -1,6 +1,6 @@
 import logging
 # from graphviz import Digraph  # type: ignore
-from collections import deque
+# from collections import deque
 import re
 
 logging.basicConfig(level=logging.INFO)

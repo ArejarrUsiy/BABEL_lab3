@@ -16,6 +16,7 @@ class TestRegexComponents(unittest.TestCase):
 class TestQuantifiers(unittest.TestCase):
     def test_star_quantifier(self):
         engine = RegexEngine(r"a*")
+        self.assertFalse(engine.match(""))
 
     def test_plus_quantifier(self):
         engine = RegexEngine(r"a+")
@@ -35,6 +36,7 @@ class TestComplexExamples(unittest.TestCase):
 
     def test_json_parser(self):
         engine = RegexEngine(r'"\w+":\s*("[^"]*"|\d+)')
+        self.assertFalse(engine.match(""))
 
 
 class TestInputValidation(unittest.TestCase):
