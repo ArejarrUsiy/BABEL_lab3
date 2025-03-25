@@ -1,30 +1,52 @@
-# GROUP-NAME - lab NUMBER - variant NUMBER
-
-This is an example project which demonstrates project structure and necessary
-CI checks. It is not the best structure for real-world projects, but good
-enough for educational purposes.
+# BABEL - lab 03 - variant 07
 
 ## Project structure
 
-- `foo.py` -- implementation of `Foo` class with `hello` and `add` features.
-   Stateless.
-- `foo_test.py` -- unit and PBT tests for `Foo`.
+regex-engine/
+├── RegularExpression.py # Core NFA implementation
+│ ├── State # NFA state with transitions
+│ ├── NFA # NFA container (start/end states)
+│ ├── RegexComponent # Base class for regex elements
+│ │ ├── Literal # Single character matching
+│ │ ├── CharClass # [a-z]/[^0-9] style matching
+│ │ ├── Quantifier # {min,max} repetition logic
+│ │ ├── AnchorStart # ^ beginning anchor
+│ │ └── AnchorEnd # $ end anchor
+│ ├── RegexParser # Pattern parsing subsystem
+│ └── RegexEngine # Matching engine with visualization
+└── RegularExpression_test.py # Comprehensive test suite
+│ ├── TestRegexComponents # Basic element tests
+│ ├── TestQuantifiers # */+ quantifier validation
+│ ├── TestSpecialConstructs # Anchor/edge case checks
+│ ├── TestComplexExamples # Real-world pattern tests
+│ └── TestInputValidation # Invalid pattern handling
 
 ## Features
 
-- PBT: `test_add_commutative`
+| Feature          | Example        | Implementation Class |
+|------------------|----------------|----------------------|
+| Literal matching | `a`, `5`       | `Literal`            |
+| Character classes| `[a-z]`, `[^0]`| `CharClass`          |
+| Predefined sets  | `\d`, `\w`     | `CharClass`          |
+| Wildcard         | `.`            | `CharClass(negative)`|
+| Anchors          | `^...$`        | `AnchorStart/End`    |
+| Custom quantifiers| `a{min,max}`  | `Quantifier`         |
 
 ## Contribution
 
-- Aleksandr Penskoi (EMAIL) -- all work.
+- LIN Yanjun (972613709@qq.com)
 
 ## Changelog
 
-- 29.03.2022 - 2
-  - Add test coverage.
-- 29.03.2022 - 1
-  - Update README. Add formal sections.
-- 29.03.2022 - 0
+- 25.03.2022 - 4
+  - Update README.
+- 25.03.2022 - 3
+  - Fix test function support.
+- 24.03.2022 - 2
+  - Add RegularExpression_test.py.
+- 24.03.2022 - 1
+  - Add RegularExpression.py.
+- 23.03.2025 - 0
   - Initial
 
 ## Design notes
