@@ -55,11 +55,8 @@
 - Learned to call from the bottom to the top using a layered architecture
    - State → NFA → RegexComponent → RegexParser → RegexEngine.
 
-- The NFA working mechanism can be implemented recursively
-   - via _add_state() ε-closure computation.
-
-- To match the parallel transfer of the process simulation state machine can be done like this
-   - current_states → char → next_states.
+- The NFA working mechanism can be implemented recursively via
+   - _add_state() ε-closure computation.
 
 - Regular validity can be verified at initialisation time
    - using standard library precalibration.
