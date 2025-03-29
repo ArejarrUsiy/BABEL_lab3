@@ -3,39 +3,39 @@
 ## Project structure
 
 - This project implements a simple regular
-expression engine using a Non-deterministic
-Finite Automaton (NFA) approach. It supports
-literal matching, character classes, anchors,
-custom quantifiers, and more. The engine even
-comes with visualization support via Graphviz.
+   expression engine using a Non-deterministic
+   Finite Automaton (NFA) approach. It supports
+   literal matching, character classes, anchors,
+   custom quantifiers, and more. The engine even
+   comes with visualization support via Graphviz.
 
 ### regex-engine/
 
 - RegularExpression.py # Core NFA implementation
    - State # NFA state with transitions
-   (including ε-transfer)
+      (including ε-transfer)
    - NFA # Container for start/end states
    - RegexComponent # Base class for regex
-   elements
+      elements
       - Literal # Matches a single character
       - CharClass # Character class matching
-      (e.g., [a-z], [^0-9])
+         (e.g., [a-z], [^0-9])
       - Quantifier # Custom quantifiers
-      (e.g., *, +, ?, {min,max})
+         (e.g., *, +, ?, {min,max})
       - AnchorStart # Start anchor (^)
       - AnchorEnd # End anchor ($)
       - Alternation # Alternation (`|` operator)
       - Group # Capturing groups
       - EscapeSequence # Escape sequences
-      (e.g., \.)
+         (e.g., \.)
       - Sequence # Sequence of regex components
    - RegexParser # Parses the pattern into
-   a component tree
+      a component tree
    - RegexEngine # The matching engine
-   (with visualization support)
+      (with visualization support)
 
 - RegularExpression_test.py # Comprehensive
-test suite covering:
+   test suite covering:
    - TestRegexComponents
    - TestQuantifiers
    - TestSpecialConstructs
@@ -57,6 +57,7 @@ test suite covering:
 ## State Machine Diagrams for Feature Examples
 
 ### 1. Literal Matching (`a`)
+
 +---------+-------+---------+ | State | Input | Next |
 +---------+-------+---------+ | 0 | a | 1 |
 +---------+-------+---------+ | 1 | Accept| - |
@@ -99,7 +100,7 @@ test suite covering:
 | State | Input | Next |
 +---------+---------+-----------------------------------+
 | 0 | 'a' | 1 | | 1 | 'a' | 2 | | 2 | 'a' | 3 (optional third 'a')
- | | 2 | ε | Accept (if only two matches) | | 3 | ε | Accept | 
+ | | 2 | ε | Accept (if only two matches) | | 3 | ε | Accept |
  +---------+---------+-----------------------------------+
 
 ## Contribution
