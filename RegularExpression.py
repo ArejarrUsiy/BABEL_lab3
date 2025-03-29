@@ -20,8 +20,8 @@ class State:
     def __init__(self):
         self.id = State._id
         State._id += 1
-        self.transitions = {}  # 字符到状态列表的映射
-        self.epsilon = []      # ε 转移列表（状态列表）
+        self.transitions = {}
+        self.epsilon = []
         self.char_class: Optional[Tuple[bool, Set[str]]] = None
         self.quantifier = None
         self.group_id = None
@@ -30,7 +30,6 @@ class State:
         self.group_end = False
         self.is_start_anchor = False
         self.is_end_anchor = False
-        # fallback 标记不再在闭包过滤中使用
         self.is_fallback = False
 
     def get_label(self):
@@ -116,18 +115,16 @@ class Quantifier(RegexComponent):
         self.max = max_
 
     def build_nfa(self) -> NFA:
-        # Kleene star：min==0, max==-1
         if self.min == 0 and self.max == -1:
             start = State()
             end = State()
-            end.is_fallback = True  # 标记为 fallback（但在闭包计算中不作过滤）
+            end.is_fallback = True
             subnfa = self.expr.build_nfa()
             start.epsilon.append(subnfa.start)
             start.epsilon.append(end)
             subnfa.end.epsilon.append(subnfa.start)
             subnfa.end.epsilon.append(end)
             return NFA(start, end)
-        # Plus quantifier：至少一次出现
         elif self.min == 1 and self.max == -1:
             mandatory = self.expr.build_nfa()
             star_part = Quantifier(self.expr, 0, -1).build_nfa()
@@ -234,7 +231,6 @@ class EscapeSequence(RegexComponent):
         self.char = char
 
     def build_nfa(self) -> NFA:
-        # 当遇到 \. 时，匹配反斜杠后任意字符
         if self.char == ".":
             seq = Sequence([Literal('\\'), CharClass(set(), positive=False)])
         else:
@@ -272,7 +268,7 @@ class RegexParser:
         seq = self.parse_sequence(stop_char)
         alternatives.append(seq)
         while self.pos < len(self.pattern) and self.pattern[self.pos] == '|':
-            self.pos += 1  # 跳过 '|'
+            self.pos += 1  # skip '|'
             seq = self.parse_sequence(stop_char)
             alternatives.append(seq)
         if len(alternatives) == 1:
@@ -309,14 +305,15 @@ class RegexParser:
                     elif quant == '?':
                         atom = Quantifier(atom, 0, 1)
                 elif quant == '{':
-                    self.pos += 1  # 跳过 '{'
+                    self.pos += 1  # skip '{'
                     atom = self._parse_curly_quantifier(atom)
             seq.append(atom)
         return seq
 
     def _parse_atom(self) -> "RegexComponent":
         if self.pos >= len(self.pattern):
-            raise ValueError("意外到达模式末尾")
+            raise ValueError(
+                "Unexpected arrival at the end of the pattern")
         char = self.pattern[self.pos]
         if char == '(':
             return self._parse_group()
@@ -334,7 +331,7 @@ class RegexParser:
         elif char == '\\':
             self.pos += 1
             if self.pos >= len(self.pattern):
-                raise ValueError("在 '\\' 后意外结束")
+                raise ValueError("Ends unexpectedly after ‘\\\’")
             next_char = self.pattern[self.pos]
             self.pos += 1
             if next_char in ('d', 'w', 's', 'D', 'W', 'S'):
@@ -352,11 +349,9 @@ class RegexParser:
                     return CharClass({' ', '\t', '\n', '\r', '\f', '\v'
                                       }, positive=False)
                 elif next_char == 'D':
-                    # 非数字: 匹配除数字以外的所有字符
                     return CharClass(set(str(i) for i in range(10)),
                                      positive=False)
                 elif next_char == 'W':
-                    # 非单词：匹配非单词字符（与 \w 相反）
                     word_chars = set(chr(i) for i in range(97, 123))
                     word_chars.update(chr(i) for i in range(65, 91))
                     word_chars.update(str(i) for i in range(10))
@@ -377,15 +372,15 @@ class RegexParser:
             return Literal(char)
 
     def _parse_group(self) -> "RegexComponent":
-        self.pos += 1  # 跳过 '('
+        self.pos += 1  # skip '('
         capturing = True
         if self.pos < len(self.pattern) and self.pattern[self.pos] == '?':
             self.pos += 1
             if self.pos < len(self.pattern) and self.pattern[self.pos] == ':':
                 capturing = False
-                self.pos += 1  # 跳过 ':'
+                self.pos += 1  # skip ':'
             else:
-                raise ValueError("不支持的组扩展")
+                raise ValueError("Unsupported group extensions")
         if capturing:
             group_id: Optional[int] = self.group_counter
             self.group_counter += 1
@@ -394,8 +389,8 @@ class RegexParser:
             group_id = None
         sub_components = self.parse_alternation(stop_char=')')
         if self.pos >= len(self.pattern) or self.pattern[self.pos] != ')':
-            raise ValueError("未闭合的分组")
-        self.pos += 1  # 跳过 ')'
+            raise ValueError("Unclosed grouping")
+        self.pos += 1
         if capturing:
             self.group_stack.pop()
             return Group(sub_components, group_id)
@@ -412,11 +407,11 @@ class RegexParser:
             self.pos += 1
         num_str = self.pattern[start_pos:self.pos]
         if not num_str:
-            raise ValueError("反向引用必须包含数字")
+            raise ValueError("Reverse references must contain numbers")
         return Backreference(int(num_str))
 
     def _parse_char_class(self) -> "RegexComponent":
-        self.pos += 1  # 跳过 '['
+        self.pos += 1  # skip '['
         positive = True
         if self.pos < len(self.pattern) and self.pattern[self.pos] == '^':
             positive = False
@@ -427,7 +422,7 @@ class RegexParser:
                     self.pos + 1 < len(self.pattern) and
                     self.pattern[self.pos + 1] != ']'):
                 prev_char = sorted(chars)[-1]
-                self.pos += 1  # 跳过 '-'
+                self.pos += 1  # skip '-'
                 range_end = self.pattern[self.pos]
                 for c in range(ord(prev_char) + 1, ord(range_end) + 1):
                     chars.add(chr(c))
@@ -436,8 +431,8 @@ class RegexParser:
                 chars.add(self.pattern[self.pos])
                 self.pos += 1
         if self.pos >= len(self.pattern) or self.pattern[self.pos] != ']':
-            raise ValueError("未闭合的字符类")
-        self.pos += 1  # 跳过 ']'
+            raise ValueError("unclosed character class")
+        self.pos += 1  # skip ']'
         return CharClass(chars, positive)
 
     def _parse_curly_quantifier(self, comp: "RegexComponent"
@@ -458,8 +453,8 @@ class RegexParser:
                 max_str += self.pattern[self.pos]
                 self.pos += 1
         if self.pos >= len(self.pattern) or self.pattern[self.pos] != '}':
-            raise ValueError("未闭合的量词")
-        self.pos += 1  # 跳过 '}'
+            raise ValueError("unclosed quantifier")
+        self.pos += 1  # skip '}'
         min_val = int(min_str) if min_str else 0
         if has_comma:
             max_val = int(max_str) if max_str else -1
@@ -516,7 +511,6 @@ class RegexEngine:
         curr.epsilon.append(end)
         return NFA(start, end)
 
-    # 直接返回所有可达状态，不过滤 fallback
     def _get_epsilon_closure(self, states: set) -> set:
         closure = set(states)
         stack = list(states)
