@@ -331,7 +331,7 @@ class RegexParser:
         elif char == '\\':
             self.pos += 1
             if self.pos >= len(self.pattern):
-                raise ValueError("Ends unexpectedly after ‘\\\’")
+                raise ValueError("Ends unexpectedly after '\\\'")
             next_char = self.pattern[self.pos]
             self.pos += 1
             if next_char in ('d', 'w', 's', 'D', 'W', 'S'):
