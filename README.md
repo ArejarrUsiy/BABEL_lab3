@@ -39,8 +39,16 @@
 
 ## Changelog
 
-- 25.03.2022 - 4
-   - Update README.
+- 28.03.2022 - 8
+   - Testing and adjustment.
+- 28.03.2022 - 7
+   - Testing and adjustment.
+- 27.03.2022 - 6
+   - Debugging code functions .
+- 26.03.2022 - 5
+   - Add sub、split.
+- 26.03.2022 - 4
+   - Add search.
 - 25.03.2022 - 3
    - Fix test function support.
 - 24.03.2022 - 2
@@ -53,10 +61,10 @@
 ## Design notes
 
 - Learned to call from the bottom to the top using a layered architecture
-   - State → NFA → RegexComponent → RegexParser → RegexEngine.
+   State → NFA → RegexComponent → RegexParser → RegexEngine.
 
 - The NFA working mechanism can be implemented recursively via
-   - _add_state() ε-closure computation.
+   _add_state() ε-closure computation.
 
 - Regular validity can be verified at initialisation time
-   - using standard library precalibration.
+   using standard library precalibration.
