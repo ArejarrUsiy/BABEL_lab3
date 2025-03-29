@@ -11,35 +11,36 @@ comes with visualization support via Graphviz.
 
 ### regex-engine/
 
-- RegularExpression.py # Core NFA implementation 
+- RegularExpression.py # Core NFA implementation
    - State # NFA state with transitions
-   (including ε-transfer) 
-   - NFA # Container for start/end states 
+   (including ε-transfer)
+   - NFA # Container for start/end states
    - RegexComponent # Base class for regex
-   elements 
-      - Literal # Matches a single character 
+   elements
+      - Literal # Matches a single character
       - CharClass # Character class matching
-      (e.g., [a-z], [^0-9]) 
+      (e.g., [a-z], [^0-9])
       - Quantifier # Custom quantifiers
-      (e.g., *, +, ?, {min,max}) 
-      - AnchorStart # Start anchor (^) 
-      - AnchorEnd # End anchor ($) 
-      - Alternation # Alternation (| operator) 
-      - Group # Capturing groups 
+      (e.g., *, +, ?, {min,max})
+      - AnchorStart # Start anchor (^)
+      - AnchorEnd # End anchor ($)
+      - Alternation # Alternation (`|` operator)
+      - Group # Capturing groups
       - EscapeSequence # Escape sequences
-      (e.g., \.) 
-      - Sequence # Sequence of regex components 
+      (e.g., \.)
+      - Sequence # Sequence of regex components
    - RegexParser # Parses the pattern into
-   a component tree 
+   a component tree
    - RegexEngine # The matching engine
-   (with visualization support) 
+   (with visualization support)
+
 - RegularExpression_test.py # Comprehensive
-test suite covering: 
-   - TestRegexComponents 
-   - TestQuantifiers 
-   - TestSpecialConstructs 
-   - TestComplexExamples 
-   - TestInputValidation 
+test suite covering:
+   - TestRegexComponents
+   - TestQuantifiers
+   - TestSpecialConstructs
+   - TestComplexExamples
+   - TestInputValidation
    - TestSearchSubSplit
 
 ## Features
@@ -56,51 +57,50 @@ test suite covering:
 ## State Machine Diagrams for Feature Examples
 
 ### 1. Literal Matching (`a`)
-+---------+-------+---------+ | State | Input | Next | 
-+---------+-------+---------+ | 0 | a | 1 | 
-+---------+-------+---------+ | 1 | Accept| - | 
++---------+-------+---------+ | State | Input | Next |
++---------+-------+---------+ | 0 | a | 1 |
++---------+-------+---------+ | 1 | Accept| - |
 +---------+-------+---------+
 
 ### 2. Character Classes (`[a-z]`)
 
-+---------+---------+---------+ | State | Input | Next | 
-+---------+---------+---------+ | 0 | [a-z] | 1 | 
-+---------+---------+---------+ | 1 | Accept | - | 
++---------+---------+---------+ | State | Input | Next |
++---------+---------+---------+ | 0 | [a-z] | 1 |
++---------+---------+---------+ | 1 | Accept | - |
 +---------+---------+---------+
 
 ### 3. Predefined Sets (`\d`)
 
-+---------+-----------+---------+ | State | Input | Next | 
-+---------+-----------+---------+ | 0 | [0-9] | 1 | 
-+---------+-----------+---------+ | 1 | Accept | - | 
++---------+-----------+---------+ | State | Input | Next |
++---------+-----------+---------+ | 0 | [0-9] | 1 |
++---------+-----------+---------+ | 1 | Accept | - |
 +---------+-----------+---------+
 
 ### 4. Wildcard (`.`)
 
-+---------+-------------+---------+ | State | Input | Next | 
-+---------+-------------+---------+ | 0 | any char | 1 | 
-+---------+-------------+---------+ | 1 | Accept | - | 
++---------+-------------+---------+ | State | Input | Next |
++---------+-------------+---------+ | 0 | any char | 1 |
++---------+-------------+---------+ | 1 | Accept | - |
 +---------+-------------+---------+
 
 ### 5. Anchors (`^a+$`)
 
-+------------------+----------------------+---------------------+ 
-| State | Transition | Next State | 
-+------------------+----------------------+---------------------+ 
-| 0 | ε | 1 | | 1 (AnchorStart) | (match start) 
-| 2 | | 2 | 'a' | 3 | | 3 | ε (loop for '+') | 2 | | 3 | ε | 4 | | 4 
-(AnchorEnd) | (match end) | 5 | | 5 | ε | Accept (6) | 
++------------------+----------------------+---------------------+
+| State | Transition | Next State |
++------------------+----------------------+---------------------+
+| 0 | ε | 1 | | 1 (AnchorStart) | (match start)
+| 2 | | 2 | 'a' | 3 | | 3 | ε (loop for '+') | 2 | | 3 | ε | 4 | | 4
+(AnchorEnd) | (match end) | 5 | | 5 | ε | Accept (6) |
 +------------------+----------------------+---------------------+
 
 ### 6. Custom Quantifiers (`a{2,3}` Example)
 
-+---------+---------+-----------------------------------+ 
-| State | Input | Next | 
-+---------+---------+-----------------------------------+ 
++---------+---------+-----------------------------------+
+| State | Input | Next |
++---------+---------+-----------------------------------+
 | 0 | 'a' | 1 | | 1 | 'a' | 2 | | 2 | 'a' | 3 (optional third 'a')
  | | 2 | ε | Accept (if only two matches) | | 3 | ε | Accept | 
  +---------+---------+-----------------------------------+
-
 
 ## Contribution
 
@@ -113,7 +113,7 @@ test suite covering:
 - 28.03.2022 - 7
    - Testing and adjustment.
 - 27.03.2022 - 6
-   - Debugging code functions .
+   - Debugging code functions.
 - 26.03.2022 - 5
    - Add sub、split.
 - 26.03.2022 - 4
