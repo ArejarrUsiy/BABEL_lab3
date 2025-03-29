@@ -1,6 +1,6 @@
 import logging
-from typing import Optional, List, Set, NamedTuple, Tuple
-from graphviz import Digraph  # type: ignore
+from typing import Optional, List, Dict, Set, NamedTuple, Tuple
+from graphviz import Digraph  # type:ignore
 from collections import deque
 
 logging.basicConfig(level=logging.INFO)
@@ -194,7 +194,7 @@ class Backreference(RegexComponent):
 
 
 class Group(RegexComponent):
-    def __init__(self, sub_components: list, group_id: int):
+    def __init__(self, sub_components: list, group_id: Optional[int]):
         self.sub_components = sub_components
         self.group_id = group_id
 
@@ -216,8 +216,8 @@ class Group(RegexComponent):
 
 class MatchContext:
     def __init__(self):
-        self.group_stack = []  # 记录活跃分组的栈
-        self.groups = {}       # 分组ID -> (start, end)
+        self.group_stack: List[int] = []
+        self.groups: Dict[int, Tuple[int, Optional[int]]] = {}
 
     def enter_group(self, group_id: int, start_pos: int):
         self.group_stack.append(group_id)
@@ -259,14 +259,15 @@ class Sequence(RegexComponent):
 
 
 class RegexParser:
-    def __init__(self, pattern: str):
+    def __init__(self, pattern: str) -> None:
         self.pattern = pattern
         self.pos = 0
-        self.groups = []
-        self.group_counter = 0
-        self.group_stack = []
+        self.groups: List[RegexComponent] = []
+        self.group_counter: int = 0
+        self.group_stack: List[Optional[int]] = []
 
-    def parse_alternation(self, stop_char: str = None) -> list:
+    def parse_alternation(
+            self, stop_char: Optional[str] = None) -> list[RegexComponent]:
         alternatives = []
         seq = self.parse_sequence(stop_char)
         alternatives.append(seq)
@@ -350,6 +351,21 @@ class RegexParser:
                 elif next_char == 'S':
                     return CharClass({' ', '\t', '\n', '\r', '\f', '\v'
                                       }, positive=False)
+                elif next_char == 'D':
+                    # 非数字: 匹配除数字以外的所有字符
+                    return CharClass(set(str(i) for i in range(10)),
+                                     positive=False)
+                elif next_char == 'W':
+                    # 非单词：匹配非单词字符（与 \w 相反）
+                    word_chars = set(chr(i) for i in range(97, 123))
+                    word_chars.update(chr(i) for i in range(65, 91))
+                    word_chars.update(str(i) for i in range(10))
+                    word_chars.add('_')
+                    return CharClass(word_chars, positive=False)
+                else:
+                    fal1 = "next_char in ('d', 'w', 's', 'D', 'W', 'S')"
+                    fal2 = "should be exhaustive"
+                    assert False, fal1 and fal2
             elif next_char in (
                 '\\', '.', '^', '$', '*', '+',
                     '?', '{', '}', '[', ']', '(', ')', '|'):
@@ -371,7 +387,7 @@ class RegexParser:
             else:
                 raise ValueError("不支持的组扩展")
         if capturing:
-            group_id = self.group_counter
+            group_id: Optional[int] = self.group_counter
             self.group_counter += 1
             self.group_stack.append(group_id)
         else:
@@ -405,7 +421,7 @@ class RegexParser:
         if self.pos < len(self.pattern) and self.pattern[self.pos] == '^':
             positive = False
             self.pos += 1
-        chars = set()
+        chars: Set[str] = set()
         while self.pos < len(self.pattern) and self.pattern[self.pos] != ']':
             if (self.pattern[self.pos] == '-' and chars and
                     self.pos + 1 < len(self.pattern) and
@@ -469,9 +485,10 @@ class RegexEngine:
         if self.end_anchor:
             trimmed_pattern = trimmed_pattern[:-1]
         parser = RegexParser(trimmed_pattern)
-        parsed_components = parser.parse()
+        parsed_components: List[RegexComponent] = parser.parse()
         if isinstance(parsed_components, list) and len(parsed_components) > 1:
-            self.components = [Sequence(parsed_components)]
+            self.components: List[RegexComponent
+                                  ] = [Sequence(parsed_components)]
         else:
             self.components = parsed_components if isinstance(
                 parsed_components, list) else [parsed_components]
@@ -512,8 +529,8 @@ class RegexEngine:
         return closure
 
     def _find_matches(self, text: str) -> list[Tuple[int, int, List[str]]]:
-        matches = []
-        n = len(text)
+        matches: list[Tuple[int, int, List[str]]] = []
+        n: int = len(text)
         for i in range(n):
             current_states = self._get_epsilon_closure({self.nfa.start})
             match_end = -1
@@ -541,7 +558,7 @@ class RegexEngine:
         return matches
 
     def _simulate_nfa(self, text: str) -> list:
-        matches = []
+        matches: list[Tuple[int, int]] = []
         n = len(text)
         for i in range(n + 1):
             current_states = self._get_epsilon_closure({self.nfa.start})
